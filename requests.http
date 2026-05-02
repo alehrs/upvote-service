@@ -1,0 +1,26 @@
+@baseUrl = http://localhost:8080
+
+### Create upvote
+POST {{baseUrl}}/upvotes
+Content-Type: application/json
+
+{
+  "article_id": "article-123",
+  "user_id": "user-333"
+}
+
+@upvoteId = 019de5fa-f326-7595-9be2-98e239422487
+@articleId = article-123
+@userId = user-232
+
+### Get upvote by ID
+GET {{baseUrl}}/upvotes/{{upvoteId}}
+
+### List upvotes by article
+GET {{baseUrl}}/upvotes?article_id={{articleId}}
+
+### List upvotes by user
+GET {{baseUrl}}/upvotes?user_id={{userId}}
+
+### Delete upvote
+DELETE {{baseUrl}}/upvotes/{{upvoteId}}

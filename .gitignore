@@ -1,0 +1,14 @@
+# binary
+upvote-service
+
+# env
+.env
+.env.local
+
+# editor
+.idea/
+.vscode/
+*.swp
+
+# os
+.DS_Store

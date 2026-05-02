@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: upvote_service
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d upvote_service"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/upvote_service
+      ADDR: :8080
+    depends_on:
+      postgres:
+        condition: service_healthy
