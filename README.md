@@ -156,6 +156,25 @@ internal/
     migrations/       → SQL migration files (embedded in the binary)
 ```
 
+## Docker image
+
+The script `scripts/build-image.sh` wraps `docker buildx build` with cross-platform support.
+
+### Build for a single platform (loads into the local Docker daemon)
+
+```bash
+PLATFORM=linux/amd64 ./scripts/build-image.sh
+PLATFORM=linux/arm64 ./scripts/build-image.sh
+```
+
+### Build multi-platform and push to a registry
+
+Multi-platform images cannot be loaded locally — they must be pushed to a registry. Set `IMAGE` to a fully qualified registry path:
+
+```bash
+IMAGE=ghcr.io/user/upvote-service ./scripts/build-image.sh
+```
+
 ## Development
 
 ```bash
