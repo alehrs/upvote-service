@@ -1,0 +1,49 @@
+name: CI/CD
+
+on:
+  push:
+    branches: ['**']
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Run tests
+        run: go test ./...
+
+  deploy:
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version
+        id: version
+        run: |
+          if [[ "${{ github.ref_name }}" == v* ]]; then
+            echo "value=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=dev-${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push image
+        run: |
+          docker build \
+            --build-arg VERSION=${{ steps.version.outputs.value }} \
+            -t registry.local:5000/upvote-service:${{ steps.version.outputs.value }} .
+          docker push registry.local:5000/upvote-service:${{ steps.version.outputs.value }}
+
+      - name: Deploy
+        run: |
+          sudo kubectl set image deployment/upvote-service \
+            upvote-service=registry.local:5000/upvote-service:${{ steps.version.outputs.value }}
+          sudo kubectl rollout status deployment/upvote-service
